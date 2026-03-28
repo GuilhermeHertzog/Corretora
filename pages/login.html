@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Administrativo — Marli Corretora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400&family=DM+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --c-bg:       #0d0c0a;
+      --c-surface:  #141210;
+      --c-border:   rgba(194,163,113,0.14);
+      --c-gold:     #c2a371;
+      --c-gold-dim: rgba(194,163,113,0.08);
+      --c-copper:   #a67c52;
+      --c-text:     #ede8df;
+      --c-text-dim: rgba(237,232,223,0.55);
+      --c-text-faint:rgba(237,232,223,0.28);
+      --f-display:  'Cormorant Garamond', serif;
+      --f-sans:     'DM Sans', system-ui, sans-serif;
+      --f-mono:     'DM Mono', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      background: var(--c-bg);
+      color: var(--c-text);
+      font-family: var(--f-sans);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        linear-gradient(160deg, rgba(13,12,10,0.35) 0%, rgba(13,12,10,0.92) 70%),
+        url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1400&q=70') center/cover no-repeat;
+      animation: bgZoom 22s ease-in-out infinite alternate;
+    }
+    @keyframes bgZoom { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+    .card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 440px;
+      margin: 24px;
+      background: rgba(20,18,16,0.95);
+      border: 1px solid var(--c-border);
+      padding: 52px 44px;
+      backdrop-filter: blur(24px);
+    }
+
+    .logo {
+      font-family: var(--f-display);
+      font-weight: 600; font-size: 28px;
+      letter-spacing: 0.06em; color: var(--c-gold);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .logo span { color: var(--c-text); }
+
+    .subtitle {
+      font-family: var(--f-mono);
+      font-size: 10px; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--c-text-faint);
+      margin-bottom: 44px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+
+    .field label {
+      font-family: var(--f-mono);
+      font-size: 10px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--c-gold);
+    }
+
+    .field input {
+      background: var(--c-gold-dim);
+      border: 1px solid var(--c-border);
+      color: var(--c-text);
+      padding: 14px 18px;
+      font-family: var(--f-sans); font-size: 15px;
+      outline: none; transition: border-color 0.2s;
+      width: 100%;
+    }
+    .field input:focus { border-color: var(--c-gold); }
+    .field input::placeholder { color: var(--c-text-faint); }
+
+    .btn-login {
+      width: 100%; margin-top: 10px;
+      background: var(--c-gold); color: var(--c-bg);
+      border: none; padding: 16px;
+      font-family: var(--f-display);
+      font-weight: 600; font-size: 18px;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-login:hover { background: var(--c-copper); transform: translateY(-1px); }
+    .btn-login:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .erro {
+      margin-top: 16px;
+      background: rgba(140,58,42,0.12);
+      border: 1px solid rgba(140,58,42,0.32);
+      color: #c07060;
+      padding: 12px 16px;
+      font-family: var(--f-mono); font-size: 11px;
+      letter-spacing: 0.1em;
+      display: none;
+    }
+
+    .voltar {
+      display: block; text-align: center; margin-top: 28px;
+      font-family: var(--f-mono);
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--c-text-faint);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .voltar:hover { color: var(--c-gold); }
+
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(13,12,10,0.3);
+      border-top-color: var(--c-bg);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true"></div>
+
+<main>
+  <div class="card">
+    <div class="logo">Marli<span> Corretora</span></div>
+    <p class="subtitle">Área Administrativa</p>
+
+    <div class="field">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="btn-login" id="btnLogin" onclick="fazerLogin()" type="button">Entrar →</button>
+
+    <div class="erro" id="erroMsg" role="alert"></div>
+
+    <a href="../index.html" class="voltar">← Voltar ao site</a>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+  const app  = initializeApp({
+    apiKey: "AIzaSyDNnPPnojavSyk2wCwDnHAOJXWvpiiyPuM",
+    authDomain: "marlicorretora-51520.firebaseapp.com",
+    projectId: "marlicorretora-51520",
+    storageBucket: "marlicorretora-51520.firebasestorage.app",
+    messagingSenderId: "779317882382",
+    appId: "1:779317882382:web:555ab972c0d5d93e48565f"
+  });
+  const auth = getAuth(app);
+
+  auth.onAuthStateChanged(user => {
+    if (user) window.location.href = 'admin.html';
+  });
+
+  window.fazerLogin = async function () {
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const btn   = document.getElementById('btnLogin');
+    const erro  = document.getElementById('erroMsg');
+
+    if (!email || !senha) {
+      erro.style.display = 'block';
+      erro.textContent = 'Preencha e-mail e senha.';
+      return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Entrando…';
+    erro.style.display = 'none';
+
+    try {
+      await signInWithEmailAndPassword(auth, email, senha);
+      window.location.href = 'admin.html';
+    } catch (e) {
+      erro.style.display = 'block';
+      erro.textContent = 'E-mail ou senha incorretos. Tente novamente.';
+      btn.disabled = false;
+      btn.textContent = 'Entrar →';
+    }
+  };
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.fazerLogin();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Catálogo de imóveis de alto padrão — Marli Corretora.">
+  <title>Catálogo de Imóveis — Marli Corretora</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* ─── Estilos específicos do Catálogo ─────────────────── */
+
+    #catalogo {
+      padding: 130px var(--gap) 100px;
+      min-height: 100vh;
+    }
+
+    .catalogo-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-end; margin-bottom: 48px;
+    }
+    .catalogo-titulo {
+      font-family: var(--f-display); font-weight: 600;
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: 0.95; letter-spacing: -0.01em; color: var(--c-text);
+    }
+    .catalogo-titulo span { color: var(--c-gold); display: block; }
+
+    .catalogo-count {
+      font-family: var(--f-mono); font-size: 12px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--c-text-faint); padding-bottom: 8px;
+    }
+    .catalogo-count strong {
+      color: var(--c-gold); font-size: 20px;
+      font-family: var(--f-display); font-weight: 600;
+    }
+
+    /* ── FILTROS ─────────────────────────────────────────── */
+    .filtros-bar {
+      background: var(--c-gold-pale);
+      border: 1px solid var(--c-border);
+      padding: 28px 32px; margin-bottom: 48px;
+    }
+    .filtros-title {
+      font-family: var(--f-mono); font-size: 10px;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--c-gold); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .filtros-title::after { content: ''; flex: 1; height: 1px; background: var(--c-border); }
+
+    .filtros-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 14px; align-items: end;
+    }
+    .filtro-campo { display: flex; flex-direction: column; gap: 6px; }
+    .filtro-campo label {
+      font-family: var(--f-mono); font-size: 10px;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-text-faint);
+    }
+    .filtro-campo select,
+    .filtro-campo input {
+      background: rgba(237,232,223,0.05);
+      border: 1px solid var(--c-border);
+      color: var(--c-text); padding: 11px 14px;
+      font-family: var(--f-sans); font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+      appearance: none; -webkit-appearance: none; width: 100%;
+    }
+    .filtro-campo select:focus,
+    .filtro-campo input:focus { border-color: var(--c-gold); }
+    .filtro-campo select option { background: var(--c-surface2, #1c1a17); }
+    .filtro-campo.select-wrap { position: relative; }
+    .filtro-campo.select-wrap::after {
+      content: '▾'; position: absolute; right: 12px; bottom: 12px;
+      color: var(--c-gold); font-size: 11px; pointer-events: none;
+    }
+    .filtros-acoes { display: flex; gap: 8px; align-items: flex-end; }
+    .btn-filtrar {
+      background: var(--c-gold); color: var(--c-bg); border: none;
+      padding: 12px 24px; font-family: var(--f-display);
+      font-weight: 600; font-size: 15px; letter-spacing: 0.06em;
+      cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-filtrar:hover { background: var(--c-copper); }
+    .btn-limpar {
+      background: transparent; color: var(--c-text-faint);
+      border: 1px solid var(--c-border); padding: 11px 20px;
+      font-family: var(--f-mono); font-size: 10px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: pointer; transition: color 0.2s, border-color 0.2s; white-space: nowrap;
+    }
+    .btn-limpar:hover { color: var(--c-text); border-color: var(--c-border-hi); }
+
+    /* ── GRID DE IMÓVEIS ─────────────────────────────────── */
+    .imoveis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 4px;
+    }
+    .imovel-card {
+      position: relative; height: 480px;
+      overflow: hidden; cursor: pointer;
+      border: 1px solid var(--c-border);
+      transition: transform 0.4s ease, border-color 0.3s;
+      /* Sem .reveal — visível por padrão */
+      opacity: 1; transform: none;
+    }
+    .imovel-card:hover { transform: translateY(-4px); border-color: var(--c-border-hi); }
+    .imovel-card img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .imovel-card:hover img { transform: scale(1.06); }
+    .imovel-placeholder {
+      width: 100%; height: 100%;
+      background: var(--c-surface2, #1c1a17);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+    }
+    .imovel-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(5,4,3,0.96) 0%, rgba(5,4,3,0.2) 50%, transparent 100%);
+    }
+    .imovel-tag {
+      position: absolute; top: 20px; left: 20px;
+      background: var(--c-gold); color: var(--c-bg);
+      font-family: var(--f-mono); font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 12px;
+    }
+    .imovel-tag.vendido { background: #6b2a1e; color: #e8c4b8; }
+    .imovel-tag.locacao { background: #1e3a5f; color: #a8c8e8; }
+    .imovel-info {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 24px;
+    }
+    .imovel-nome {
+      font-family: var(--f-display); font-weight: 600;
+      font-size: 26px; line-height: 1.05; margin-bottom: 4px;
+    }
+    .imovel-local {
+      font-family: var(--f-mono); font-size: 10px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--c-text-dim); margin-bottom: 10px;
+    }
+    .imovel-preco {
+      font-family: var(--f-display); font-weight: 600;
+      font-size: 26px; color: var(--c-gold); margin-bottom: 12px;
+    }
+    .imovel-specs { display: flex; gap: 14px; flex-wrap: wrap; }
+    .imovel-spec {
+      font-family: var(--f-mono); font-size: 9px;
+      letter-spacing: 0.1em; color: var(--c-text-dim);
+    }
+    .imovel-spec strong { color: var(--c-text); font-size: 12px; }
+    .btn-ver-mais {
+      position: absolute; bottom: 24px; right: 24px;
+      background: var(--c-gold); color: var(--c-bg); border: none;
+      padding: 10px 20px; font-family: var(--f-display);
+      font-weight: 600; font-size: 14px; cursor: pointer;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .imovel-card:hover .btn-ver-mais { opacity: 1; transform: translateY(0); }
+
+    .sem-resultados { grid-column: 1/-1; text-align: center; padding: 80px 0; }
+    .sem-resultados p {
+      font-family: var(--f-display); font-size: 32px;
+      font-weight: 600; margin-bottom: 8px; color: var(--c-text);
+    }
+    .sem-resultados span {
+      font-family: var(--f-mono); font-size: 11px;
+      letter-spacing: 0.18em; color: var(--c-text-faint);
+    }
+    .loading-state { grid-column: 1/-1; text-align: center; padding: 80px 0; }
+    .loading-dots span {
+      display: inline-block; width: 9px; height: 9px;
+      background: var(--c-gold); border-radius: 50%; margin: 0 5px;
+      animation: ldot 1.2s ease-in-out infinite;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ldot { 0%,80%,100%{transform:scale(0);opacity:0.3} 40%{transform:scale(1);opacity:1} }
+
+    /* ── MODAL ───────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(5,4,3,0.93); backdrop-filter: blur(18px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease; overflow-y: auto;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      position: relative; max-width: 1100px; margin: 60px auto;
+      background: var(--c-surface, #141210); border: 1px solid var(--c-border);
+      transform: translateY(28px);
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+    .modal-close {
+      position: fixed; top: 24px; right: 36px; z-index: 5100;
+      font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--c-gold);
+      background: rgba(13,12,10,0.92); border: 1px solid var(--c-border-hi);
+      padding: 9px 18px; cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .modal-close:hover { background: var(--c-gold); color: var(--c-bg); }
+    .modal-galeria {
+      position: relative;
+      height: clamp(300px, 55vh, 600px);
+      overflow: hidden;
+      background: #000;
+    }
+    .modal-galeria-imgs {
+      display: flex;
+      height: 100%;
+      transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .modal-galeria-imgs img {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;   /* mostra a imagem inteira sem cortar */
+      object-position: center;
+      display: block;
+      background: #0d0c0a;   /* fundo escuro nas laterais quando há letterbox */
+    }
+    .galeria-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(13,12,10,0.82); border: 1px solid var(--c-border);
+      color: var(--c-gold); font-size: 20px; width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s; z-index: 10;
+    }
+    .galeria-nav:hover { background: var(--c-gold-dim); }
+    .galeria-prev { left: 16px; } .galeria-next { right: 16px; }
+    .galeria-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
+    .gdot { width: 6px; height: 6px; border-radius: 50%; background: rgba(237,232,223,0.25); cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .gdot.active { background: var(--c-gold); transform: scale(1.4); }
+    .galeria-counter { position: absolute; top: 16px; left: 20px; font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.2em; color: rgba(237,232,223,0.6); background: rgba(5,4,3,0.72); padding: 4px 10px; }
+    .modal-content { padding: 48px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; }
+    .modal-badge { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--c-gold); margin-bottom: 12px; }
+    .modal-nome { font-family: var(--f-display); font-weight: 600; font-size: clamp(34px,4vw,54px); line-height: 0.95; margin-bottom: 10px; }
+    .modal-local { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--c-text-faint); margin-bottom: 28px; }
+    .modal-desc { font-size: 15px; font-weight: 300; line-height: 1.9; color: var(--c-text-dim); margin-bottom: 32px; }
+    .modal-atributos { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; margin-bottom: 32px; }
+    .modal-attr { background: var(--c-gold-pale); border: 1px solid var(--c-border); padding: 16px; text-align: center; }
+    .modal-attr-num { font-family: var(--f-display); font-weight: 600; font-size: 30px; color: var(--c-gold); line-height: 1; }
+    .modal-attr-label { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--c-text-faint); margin-top: 4px; }
+    .modal-painel { border-left: 1px solid var(--c-border); padding-left: 52px; display: flex; flex-direction: column; }
+    .modal-preco-label { font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--c-text-faint); margin-bottom: 6px; }
+    .modal-preco { font-family: var(--f-display); font-weight: 600; font-size: clamp(28px,3vw,44px); color: var(--c-gold); line-height: 1; margin-bottom: 6px; }
+    .modal-preco-m2 { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.14em; color: var(--c-text-faint); margin-bottom: 28px; }
+    .modal-divider { height: 1px; background: var(--c-border); margin: 20px 0; }
+    .modal-detalhes-lista { display: flex; flex-direction: column; margin-bottom: 28px; }
+    .modal-detalhe-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--c-border); }
+    .modal-detalhe-key { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-text-faint); }
+    .modal-detalhe-val { font-family: var(--f-display); font-weight: 600; font-size: 16px; color: var(--c-text); }
+    .btn-contato-modal { background: var(--c-gold); color: var(--c-bg); border: none; padding: 16px 28px; font-family: var(--f-display); font-weight: 600; font-size: 17px; cursor: pointer; width: 100%; margin-bottom: 10px; transition: background 0.2s; }
+    .btn-contato-modal:hover { background: var(--c-copper); }
+    .btn-whatsapp-modal { background: transparent; color: #4a9e6e; border: 1px solid #4a9e6e; padding: 14px 28px; font-family: var(--f-display); font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; transition: background 0.2s,color 0.2s; }
+    .btn-whatsapp-modal:hover { background: #4a9e6e; color: #fff; }
+    .modal-comodidades { margin-top: 36px; padding-top: 36px; border-top: 1px solid var(--c-border); grid-column: 1/-1; }
+    .modal-comod-title { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--c-gold); margin-bottom: 20px; }
+    .comod-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 8px; }
+    .comod-item { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-text-dim); padding: 10px 14px; background: var(--c-gold-pale); border: 1px solid var(--c-border); }
+    .comod-item::before { content: '✓'; color: var(--c-gold); font-size: 11px; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #catalogo { padding: 110px var(--gap) 60px; }
+      .imoveis-grid { grid-template-columns: 1fr; }
+      .filtros-grid { grid-template-columns: 1fr 1fr; }
+      .filtros-bar { padding: 18px 20px; }
+      .imovel-card { height: 380px; }
+      .modal-content { grid-template-columns: 1fr; gap: 32px; padding: 24px; }
+      .modal-painel { border-left: none; padding-left: 0; border-top: 1px solid var(--c-border); padding-top: 28px; }
+      .modal-galeria { height: clamp(220px, 40vh, 360px); }
+      .modal-box { margin: 0; }
+      .modal-comodidades { grid-column: 1; }
+      .catalogo-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Detalhes do imóvel">
+  <button class="modal-close" id="modalClose" aria-label="Fechar">✕ Fechar</button>
+  <article class="modal-box">
+    <div class="modal-galeria">
+      <div class="modal-galeria-imgs" id="modalGaleriaImgs"></div>
+      <button class="galeria-nav galeria-prev" id="galeriaPrev" aria-label="Foto anterior">‹</button>
+      <button class="galeria-nav galeria-next" id="galeriaNext" aria-label="Próxima foto">›</button>
+      <div class="galeria-dots" id="galeriaDots"></div>
+      <div class="galeria-counter" id="galeriaCounter"></div>
+    </div>
+    <div class="modal-content">
+      <div>
+        <p class="modal-badge"  id="modalBadge"></p>
+        <h2 class="modal-nome"  id="modalNome"></h2>
+        <p class="modal-local"  id="modalLocal"></p>
+        <p class="modal-desc"   id="modalDesc"></p>
+        <div class="modal-atributos" id="modalAtributos"></div>
+      </div>
+      <aside class="modal-painel">
+        <p class="modal-preco-label">Valor</p>
+        <p class="modal-preco"    id="modalPreco"></p>
+        <p class="modal-preco-m2" id="modalPrecoM2"></p>
+        <div class="modal-divider"></div>
+        <div class="modal-detalhes-lista" id="modalDetalhesList"></div>
+        <button class="btn-contato-modal" id="btnContatoModal" type="button">Solicitar Informações →</button>
+        <button class="btn-whatsapp-modal" id="btnWhatsModal"  type="button">💬 Chamar no WhatsApp</button>
+      </aside>
+      <section class="modal-comodidades">
+        <p class="modal-comod-title">Comodidades &amp; Diferenciais</p>
+        <div class="comod-grid" id="modalComodGrid"></div>
+      </section>
+    </div>
+  </article>
+</div>
+
+<!-- NAV — usa classes do style.css normalmente -->
+<header>
+  <nav class="site-nav" aria-label="Navegação principal">
+    <a class="nav-logo" href="../index.html">Marli<span> Corretora</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html#sobre">Sobre</a></li>
+      <li><a href="catalogo.html" aria-current="page">Imóveis</a></li>
+      <li><a href="../index.html#destaque">Destaques</a></li>
+      <li><a href="../index.html#contato">Contato</a></li>
+    </ul>
+    <a href="../index.html#contato" class="nav-cta">Contato</a>
+  </nav>
+</header>
+
+<main>
+  <section id="catalogo" aria-labelledby="catalogo-heading">
+
+    <!-- Sem classe .reveal aqui — evita o opacity:0 do style.css -->
+    <div class="catalogo-header">
+      <h1 class="catalogo-titulo" id="catalogo-heading">
+        Catálogo<br><span>de Imóveis</span>
+      </h1>
+      <p class="catalogo-count">
+        <strong id="countNum">—</strong> imóveis encontrados
+      </p>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filtros-bar" role="search" aria-label="Filtros de busca">
+      <p class="filtros-title">Filtrar Imóveis</p>
+      <div class="filtros-grid">
+
+        <div class="filtro-campo select-wrap">
+          <label for="filtCidade">Cidade</label>
+          <select id="filtCidade"><option value="">Todas</option></select>
+        </div>
+
+        <div class="filtro-campo select-wrap">
+          <label for="filtBairro">Bairro</label>
+          <select id="filtBairro"><option value="">Todos</option></select>
+        </div>
+
+        <div class="filtro-campo select-wrap">
+          <label for="filtTipo">Tipo</label>
+          <select id="filtTipo">
+            <option value="">Todos</option>
+            <option>Casa</option>
+            <option>Apartamento</option>
+            <option>Cobertura</option>
+            <option>Terreno</option>
+          </select>
+        </div>
+
+        <div class="filtro-campo select-wrap">
+          <label for="filtQuartos">Quartos</label>
+          <select id="filtQuartos">
+            <option value="">Qualquer</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="5">5+</option>
+          </select>
+        </div>
+
+        <div class="filtro-campo select-wrap">
+          <label for="filtGaragem">Garagem</label>
+          <select id="filtGaragem">
+            <option value="">Qualquer</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+
+        <div class="filtro-campo select-wrap">
+          <label for="filtPreco">Preço máximo</label>
+          <select id="filtPreco">
+            <option value="">Tudo</option>
+            <option value="100000">Até R$ 100 mil</option>
+            <option value="300000">Até R$ 300 mil</option>
+            <option value="2000000">Até R$ 500 mil</option>
+            <option value="1000000">Até R$ 1 milhão</option>
+          </select>
+        </div>
+
+        <div class="filtro-campo select-wrap">
+          <label for="filtSituacao">Situação</label>
+          <select id="filtSituacao">
+            <option value="">Todas</option>
+            <option>Venda</option>
+            <option>Locação</option>
+          </select>
+        </div>
+
+        
+
+        <div class="filtros-acoes">
+          <button class="btn-filtrar" onclick="aplicarFiltros()" type="button">Filtrar →</button>
+          <button class="btn-limpar"  onclick="limparFiltros()"  type="button">Limpar</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="imoveis-grid" id="imoveisGrid" role="list">
+      <div class="loading-state">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- usa classes do style.css -->
+  <div class="divider" aria-hidden="true">
+    <span class="divider-icon">— Marli Corretora de Imóveis —</span>
+  </div>
+</main>
+
+<!-- usa classes do style.css -->
+<footer class="site-footer">
+  <div class="footer-logo">Marli<span> Corretora</span></div>
+  <p class="footer-copy">© 2026 Marli Corretora de Imóveis. Todos os direitos reservados.</p>
+  <nav class="footer-links" aria-label="Links do rodapé">
+    <a href="#">Privacidade</a>
+    <a href="#">Termos</a>
+    <a href="#">CRECI 12345-F</a>
+  </nav>
+</footer>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyDNnPPnojavSyk2wCwDnHAOJXWvpiiyPuM",
+  authDomain: "marlicorretora-51520.firebaseapp.com",
+  projectId: "marlicorretora-51520",
+  storageBucket: "marlicorretora-51520.firebasestorage.app",
+  messagingSenderId: "779317882382",
+  appId: "1:779317882382:web:555ab972c0d5d93e48565f"
+});
+const db = getFirestore(app);
+
+let todosImoveis = [];
+let galeriaIdx   = 0;
+let galeriaFotos = [];
+
+// ── NAV hide/show (usa a mesma lógica do script.js) ───────
+let lastScrollY = 0;
+const nav = document.querySelector('.site-nav');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  if (y > 80 && y > lastScrollY) {
+    nav.style.opacity = '0'; nav.style.transform = 'translateY(-100%)';
+  } else {
+    nav.style.opacity = '1'; nav.style.transform = 'translateY(0)';
+  }
+  lastScrollY = y;
+}, { passive: true });
+
+// ── CARREGAR IMÓVEIS ──────────────────────────────────────
+onSnapshot(collection(db, 'imoveis'), snap => {
+  todosImoveis = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(im => im.situacao !== 'Vendido')
+    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  popularFiltros();
+  renderGrid(todosImoveis);
+});
+
+// ── POPULAR FILTROS ───────────────────────────────────────
+function popularFiltros() {
+  const cidades = [...new Set(todosImoveis.map(i => i.cidade).filter(Boolean))].sort();
+  const bairros = [...new Set(todosImoveis.map(i => i.bairro).filter(Boolean))].sort();
+  const selC = document.getElementById('filtCidade');
+  const selB = document.getElementById('filtBairro');
+  const valC = selC.value; const valB = selB.value;
+  selC.innerHTML = '<option value="">Todas</option>' + cidades.map(c => `<option ${c===valC?'selected':''}>${c}</option>`).join('');
+  selB.innerHTML = '<option value="">Todos</option>'  + bairros.map(b => `<option ${b===valB?'selected':''}>${b}</option>`).join('');
+}
+
+// ── RENDER GRID ───────────────────────────────────────────
+function renderGrid(lista) {
+  const grid = document.getElementById('imoveisGrid');
+  document.getElementById('countNum').textContent = lista.length;
+  grid.innerHTML = '';
+
+  if (!lista.length) {
+    grid.innerHTML = `
+      <div class="sem-resultados">
+        <p>Nenhum imóvel encontrado</p>
+        <span>Tente ajustar os filtros</span>
+      </div>`;
+    return;
+  }
+
+  lista.forEach(im => {
+    const card = document.createElement('article');
+    card.className = 'imovel-card'; // SEM .reveal
+    card.setAttribute('role', 'listitem');
+    card.setAttribute('tabindex', '0');
+    card.innerHTML = `
+      ${im.thumb
+        ? `<img src="${im.thumb}" alt="${im.nome}" loading="lazy">`
+        : `<div class="imovel-placeholder" aria-hidden="true">🏠</div>`}
+      <div class="imovel-overlay" aria-hidden="true"></div>
+      <span class="imovel-tag ${im.tagClass||''}">${im.tag||'Disponível'}</span>
+      <div class="imovel-info">
+        <h2 class="imovel-nome">${im.nome}</h2>
+        <p class="imovel-local">📍 ${im.bairro}, ${im.cidade}</p>
+        <p class="imovel-preco">${im.precoFmt}</p>
+        <div class="imovel-specs">
+          <div class="imovel-spec"><strong>${im.quartos||0}</strong>&nbsp;Qtos</div>
+          <div class="imovel-spec"><strong>${im.suites||0}</strong>&nbsp;Suítes</div>
+          <div class="imovel-spec"><strong>${im.banheiros||0}</strong>&nbsp;Banhos</div>
+          <div class="imovel-spec"><strong>${im.garagem||0}</strong>&nbsp;Vagas</div>
+          <div class="imovel-spec"><strong>${im.area||0}</strong>&nbsp;m²</div>
+        </div>
+      </div>
+      <button class="btn-ver-mais" type="button">Ver Detalhes →</button>
+    `;
+    card.addEventListener('click', () => abrirModal(im));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter') abrirModal(im); });
+    grid.appendChild(card);
+  });
+}
+
+// ── FILTROS ───────────────────────────────────────────────
+window.aplicarFiltros = function () {
+  const cidade   = document.getElementById('filtCidade').value;
+  const bairro   = document.getElementById('filtBairro').value;
+  const tipo     = document.getElementById('filtTipo').value;
+  const quartos  = parseInt(document.getElementById('filtQuartos').value) || 0;
+  const garagem  = parseInt(document.getElementById('filtGaragem').value) || 0;
+  const precoMax = parseInt(document.getElementById('filtPreco').value)   || Infinity;
+  const situacao = document.getElementById('filtSituacao').value;
+  const areaMin  = parseInt(document.getElementById('filtArea').value)    || 0;
+
+  renderGrid(todosImoveis.filter(im => {
+    if (cidade   && im.cidade   !== cidade)   return false;
+    if (bairro   && im.bairro   !== bairro)   return false;
+    if (tipo     && im.tipo     !== tipo)     return false;
+    if (situacao && im.situacao !== situacao) return false;
+    if ((im.quartos||0) < quartos)  return false;
+    if ((im.garagem||0) < garagem)  return false;
+    if ((im.preco||0)   > precoMax) return false;
+    if ((im.area||0)    < areaMin)  return false;
+    return true;
+  }));
+};
+
+window.limparFiltros = function () {
+  ['filtCidade','filtBairro','filtTipo','filtQuartos','filtGaragem','filtPreco','filtSituacao']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('filtArea').value = '';
+  renderGrid(todosImoveis);
+};
+
+// ── MODAL ─────────────────────────────────────────────────
+function abrirModal(im) {
+  galeriaFotos = im.fotos?.length ? im.fotos : (im.thumb ? [im.thumb] : []);
+  galeriaIdx = 0;
+
+  const galeriaEl = document.getElementById('modalGaleriaImgs');
+  galeriaEl.innerHTML = galeriaFotos.length
+    ? galeriaFotos.map(f => `<img src="${f}" alt="${im.nome}" loading="lazy">`).join('')
+    : `<div style="width:100%;height:100%;background:#1c1a17;display:flex;align-items:center;justify-content:center;font-size:64px;">🏠</div>`;
+  galeriaEl.style.transform = 'translateX(0)';
+
+  document.getElementById('galeriaDots').innerHTML =
+    galeriaFotos.map((_,i) =>
+      `<div class="gdot ${i===0?'active':''}" onclick="irFoto(${i})" role="button" tabindex="0"></div>`
+    ).join('');
+  atualizarCounter();
+
+  document.getElementById('modalBadge').textContent   = `${im.tag||''} · ${im.tipo||''} · ${im.situacao||''}`;
+  document.getElementById('modalNome').textContent    = im.nome;
+  document.getElementById('modalLocal').textContent   = `📍 ${im.endereco || im.bairro + ', ' + im.cidade}`;
+  document.getElementById('modalPreco').textContent   = im.precoFmt;
+  document.getElementById('modalPrecoM2').textContent = im.area
+    ? `R$ ${Math.round((im.preco||0)/im.area).toLocaleString('pt-BR')} / m²` : '';
+  document.getElementById('modalDesc').textContent    = im.descricao || '';
+
+  document.getElementById('modalAtributos').innerHTML = `
+    <div class="modal-attr"><div class="modal-attr-num">${im.quartos||0}</div><div class="modal-attr-label">Quartos</div></div>
+    <div class="modal-attr"><div class="modal-attr-num">${im.suites||0}</div><div class="modal-attr-label">Suítes</div></div>
+    <div class="modal-attr"><div class="modal-attr-num">${im.banheiros||0}</div><div class="modal-attr-label">Banheiros</div></div>
+    <div class="modal-attr"><div class="modal-attr-num">${im.garagem||0}</div><div class="modal-attr-label">Garagem</div></div>
+    <div class="modal-attr"><div class="modal-attr-num">${im.area||0}</div><div class="modal-attr-label">m²</div></div>
+    <div class="modal-attr"><div class="modal-attr-num">${galeriaFotos.length}</div><div class="modal-attr-label">Fotos</div></div>
+  `;
+
+  document.getElementById('modalDetalhesList').innerHTML = `
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Cidade</span><span class="modal-detalhe-val">${im.cidade||'—'}</span></div>
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Bairro</span><span class="modal-detalhe-val">${im.bairro||'—'}</span></div>
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Tipo</span><span class="modal-detalhe-val">${im.tipo||'—'}</span></div>
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Situação</span><span class="modal-detalhe-val">${im.situacao||'—'}</span></div>
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Área Total</span><span class="modal-detalhe-val">${im.area||0} m²</span></div>
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Quartos</span><span class="modal-detalhe-val">${im.quartos||0} (${im.suites||0} suítes)</span></div>
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Banheiros</span><span class="modal-detalhe-val">${im.banheiros||0}</span></div>
+    <div class="modal-detalhe-row"><span class="modal-detalhe-key">Garagem</span><span class="modal-detalhe-val">${im.garagem||0} vagas</span></div>
+  `;
+
+  document.getElementById('modalComodGrid').innerHTML = (im.comodidades||[]).length
+    ? im.comodidades.map(c => `<div class="comod-item">${c}</div>`).join('')
+    : `<p style="color:var(--c-text-faint);font-family:var(--f-mono);font-size:10px">Nenhuma comodidade cadastrada.</p>`;
+
+  const msg = encodeURIComponent(`Olá! Tenho interesse no imóvel *${im.nome}* (${im.precoFmt}). Poderia me dar mais informações?`);
+  document.getElementById('btnWhatsModal').onclick   = () => window.open(`https://wa.me/5545991077210?text=${msg}`, '_blank');
+  document.getElementById('btnContatoModal').onclick = () => { fecharModal(); window.location.href = '../index.html#contato'; };
+
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  overlay.scrollTop = 0;
+}
+
+function fecharModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+window.irFoto = function (idx) {
+  galeriaIdx = (idx + galeriaFotos.length) % galeriaFotos.length;
+  document.getElementById('modalGaleriaImgs').style.transform = `translateX(-${galeriaIdx * 100}%)`;
+  document.querySelectorAll('.gdot').forEach((d,i) => d.classList.toggle('active', i===galeriaIdx));
+  atualizarCounter();
+};
+function atualizarCounter() {
+  document.getElementById('galeriaCounter').textContent =
+    galeriaFotos.length ? `${galeriaIdx+1} / ${galeriaFotos.length}` : '';
+}
+
+document.getElementById('galeriaPrev').addEventListener('click', () => window.irFoto(galeriaIdx-1));
+document.getElementById('galeriaNext').addEventListener('click', () => window.irFoto(galeriaIdx+1));
+document.getElementById('modalClose').addEventListener('click', fecharModal);
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) fecharModal();
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('modalOverlay').classList.contains('open')) return;
+  if (e.key === 'Escape')     fecharModal();
+  if (e.key === 'ArrowLeft')  window.irFoto(galeriaIdx-1);
+  if (e.key === 'ArrowRight') window.irFoto(galeriaIdx+1);
+});
+let mTouchX = 0;
+document.getElementById('modalOverlay').addEventListener('touchstart', e => { mTouchX = e.touches[0].clientX; }, { passive: true });
+document.getElementById('modalOverlay').addEventListener('touchend', e => {
+  const diff = mTouchX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) diff > 0 ? window.irFoto(galeriaIdx+1) : window.irFoto(galeriaIdx-1);
+});
+</script>
+
+</body>
+</html>
