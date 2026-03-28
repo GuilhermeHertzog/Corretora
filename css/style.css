@@ -197,7 +197,7 @@ button { font-family: inherit; }
   font-family: 'Barlow Condensed', sans-serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(72px, 11vw, 164px);
+  font-size: clamp(50px, 10vw, 150px);
   line-height: 0.86;
   letter-spacing: -0.02em;
   color: var(--c-gold);
@@ -206,7 +206,7 @@ button { font-family: inherit; }
 .hero-title .line-solid {
   font-family: 'Space Mono', monospace;
   font-weight: 600;
-  font-size: clamp(72px, 11vw, 164px);
+  font-size: clamp(50px, 8vw, 150px);
   line-height: 0.86;
   letter-spacing: -0.02em;
   color: var(--c-text);
