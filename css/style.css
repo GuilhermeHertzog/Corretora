@@ -226,25 +226,6 @@ button { font-family: inherit; }
   animation: fadeUp 0.8s ease 0.75s forwards;
 }
 
-.hero-scroll {
-  position: absolute;
-  right: var(--gap);
-  bottom: 72px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--f-mono);
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--c-text-faint);
-}
-.hero-scroll .scroll-line {
-  width: 1px; height: 56px;
-  background: linear-gradient(to bottom, var(--c-gold), transparent);
-  animation: scrollPulse 2.2s ease-in-out infinite;
-}
 @keyframes scrollPulse {
   0%,100% { opacity: 0.25; transform: scaleY(0.5); transform-origin: top; }
   50%      { opacity: 0.9; transform: scaleY(1); }

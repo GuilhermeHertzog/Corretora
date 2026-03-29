@@ -58,11 +58,6 @@
         Invista no seu futuro, com propriedades que oferece retorno garantido. Consulte-nos!
       </p>
     </div>
-
-    <div class="hero-scroll" aria-hidden="true">
-      <div class="scroll-line"></div>
-      Role
-    </div>
   </section>
 
   <!-- TICKER -->
@@ -220,18 +215,18 @@
         </address>
       </div>
 
-      <div class="contact-form reveal reveal-delay-2" role="form" aria-label="Formulário de contato">
+      <form id="contatoForm" class="contact-form" aria-label="Formulário de contato" novalidate>
         <div class="form-field">
           <label for="contato-nome">Nome Completo</label>
-          <input type="text" id="contato-nome" placeholder="Seu nome" autocomplete="name">
+          <input type="text" name="nome" id="contato-nome" placeholder="Seu nome" autocomplete="name" required>
         </div>
         <div class="form-field">
           <label for="contato-email">E-mail</label>
-          <input type="email" id="contato-email" placeholder="seu@email.com" autocomplete="email">
+          <input type="email" name="email" id="contato-email" placeholder="seu@email.com" autocomplete="email" required>
         </div>
         <div class="form-field">
           <label for="contato-faixa">Faixa de Investimento</label>
-          <select id="contato-faixa">
+          <select name="faixa" id="contato-faixa">
             <option>R$ 100 Mil – R$ 300 Mil</option>
             <option>R$ 300 Mil – R$ 500 Mil</option>
             <option>R$ 500 Mil – R$ 1M</option>
@@ -240,11 +235,28 @@
         </div>
         <div class="form-field">
           <label for="contato-mensagem">Mensagem</label>
-          <textarea id="contato-mensagem" placeholder="Conte-nos sobre o imóvel dos seus sonhos…"></textarea>
+          <textarea name="mensagem" id="contato-mensagem" placeholder="Conte-nos sobre o imóvel dos seus sonhos…" required></textarea>
         </div>
-        <button class="submit-btn" type="button">Enviar Proposta →</button>
+
+        <!-- Feedback -->
+        <div id="form-feedback" style="
+          display:none; padding:14px 18px; margin-bottom:4px;
+          font-family:var(--f-mono); font-size:11px; letter-spacing:0.12em;
+        "></div>
+
+        <button class="submit-btn" type="submit" id="btn-enviar">
+          Enviar Proposta →
+        </button>
+      </form>
+
+      <!-- Mensagem de sucesso (oculta inicialmente) -->
+      <div id="form-sucesso" style="
+        display:none; padding:32px 24px; text-align:center;
+        border:1px solid rgba(74,140,111,0.3); background:rgba(74,140,111,0.08);
+      ">
+        <p style="font-family:var(--f-display);font-size:28px;color:var(--c-gold);margin-bottom:8px">Mensagem Enviada</p>
+        <p style="font-family:var(--f-mono);font-size:11px;letter-spacing:0.14em;color:var(--c-text-dim)">Entraremos em contato em breve.</p>
       </div>
-    </div>
   </section>
 
 </main>
@@ -283,6 +295,85 @@
 </div>
 
 <script src="js/script.js"></script>
+
+<script>
+const contatoForm    = document.getElementById('contatoForm');
+const formSucesso    = document.getElementById('form-sucesso');
+const CONTATO_URL    = 'https://script.google.com/macros/s/AKfycbz10_qdFU1p4hye3eHvHwaHlTkSZ37mgFCfRAnMMi-yUCKsX9MItmO6XMwodCnSPFt7Dg/exec';
+
+contatoForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const btn = document.getElementById('btn-enviar');
+  const feedback = document.getElementById('form-feedback');
+
+  // Validação manual
+  const nome     = contatoForm.nome.value.trim();
+  const email    = contatoForm.email.value.trim();
+  const mensagem = contatoForm.mensagem.value.trim();
+
+  if (!nome || !email || !mensagem) {
+    mostrarFeedback('Preencha Nome, E-mail e Mensagem.', 'erro');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    mostrarFeedback('Digite um e-mail válido.', 'erro');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+  feedback.style.display = 'none';
+
+  const dados = {
+    nome,
+    email,
+    faixa:    contatoForm.faixa.value,
+    mensagem
+  };
+
+  const formData = new FormData();
+  formData.append('data', JSON.stringify(dados));
+
+  fetch(CONTATO_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain'
+    },
+    body: JSON.stringify(dados)
+  })
+  .then(res => res.json())
+  .then(res => {
+    console.log(res); // 👈 MUITO IMPORTANTE
+
+    if (res.success) {
+      contatoForm.style.display = 'none';
+      formSucesso.style.display = 'block';
+    } else {
+      throw new Error(res.error);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    mostrarFeedback('Erro ao enviar.', 'erro');
+  });
+});
+
+function mostrarFeedback(msg, tipo) {
+  const el = document.getElementById('form-feedback');
+  el.textContent = msg;
+  el.style.display = 'block';
+  if (tipo === 'ok') {
+    el.style.background = 'rgba(74,140,111,0.12)';
+    el.style.border     = '1px solid rgba(74,140,111,0.3)';
+    el.style.color      = '#4a9e6e';
+  } else {
+    el.style.background = 'rgba(140,58,42,0.12)';
+    el.style.border     = '1px solid rgba(140,58,42,0.3)';
+    el.style.color      = '#c07060';
+  }
+}
+</script>
 
 <!-- Firebase Auth -->
 <script type="module">
